@@ -1,21 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./images.module.css";
 import ToggleImage from "./toggle-image";
 
 export default function Images() {
   const [imagePos, setImagePos] = useState(0);
+  const [imageSize, setImageSize] = useState([0, 0]);
+
+  useEffect(() => {
+    console.log(document.querySelector(".toggle-image"));
+    const handleImageResize = () => {
+      if (window.innerWidth / (window.innerHeight - 100) > 0.8) {
+        setImageSize([
+          (window.innerHeight - 100) * 0.8,
+          window.innerHeight - 100,
+        ]);
+      } else {
+        setImageSize([window.innerWidth, window.innerWidth * 1.25]);
+      }
+    };
+
+    handleImageResize();
+    window.addEventListener("resize", handleImageResize);
+
+    return () => {
+      window.removeEventListener("resize", handleImageResize);
+    };
+  }, []);
 
   const avancarImagePosHandler = () => {
     if (imagePos < 5) {
       setImagePos(imagePos + 1);
+    } else {
+      setImagePos(0);
     }
   };
 
   const voltarImagePosHandler = () => {
     if (imagePos > 0) {
       setImagePos(imagePos - 1);
+    } else {
+      setImagePos(5);
     }
   };
 
@@ -28,20 +54,6 @@ export default function Images() {
     "/2001/V06.jpg",
   ];
 
-  const windowWidth = window.innerWidth;
-  const windowHeigth = window.innerHeight - 48;
-
-  let imageWidth = 100;
-  let imageHeight = 100;
-
-  if (windowWidth / windowHeigth > 0.8) {
-    imageHeight = windowHeigth;
-    imageWidth = windowHeigth * 0.8;
-  } else {
-    imageWidth = windowWidth;
-    imageHeight = windowWidth * 1.25;
-  }
-
   return (
     <div className={styles["images"]}>
       <ToggleImage
@@ -50,8 +62,8 @@ export default function Images() {
       />
       <img
         src={images[imagePos]}
-        width={imageWidth}
-        height={imageHeight}
+        width={imageSize[0]}
+        height={imageSize[1]}
         alt="apto 2001"
       />
     </div>
